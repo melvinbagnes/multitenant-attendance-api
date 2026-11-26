@@ -1,0 +1,39 @@
+@host = http://localhost:8080
+@tenant = 11111111-1111-1111-1111-111111111111
+
+### 1. Get a demo token (Development only)
+# @name token
+POST {{host}}/dev/token
+Content-Type: application/json
+
+{ "tenantId": "{{tenant}}", "userName": "melvin" }
+
+### 2. Create an employee
+@jwt = {{token.response.body.accessToken}}
+
+# @name employee
+POST {{host}}/api/employees
+Authorization: Bearer {{jwt}}
+Content-Type: application/json
+
+{ "employeeNumber": "E-001", "fullName": "Juan Dela Cruz" }
+
+### 3. Clock in
+@employeeId = {{employee.response.body.id}}
+
+POST {{host}}/api/attendance/clock-in
+Authorization: Bearer {{jwt}}
+Content-Type: application/json
+
+{ "employeeId": "{{employeeId}}", "note": "Morning shift" }
+
+### 4. Clock out
+POST {{host}}/api/attendance/clock-out
+Authorization: Bearer {{jwt}}
+Content-Type: application/json
+
+{ "employeeId": "{{employeeId}}" }
+
+### 5. Daily report (regular vs overtime hours)
+GET {{host}}/api/reports/daily
+Authorization: Bearer {{jwt}}
